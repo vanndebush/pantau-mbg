@@ -1,0 +1,18 @@
+.page-section {
+  display: none;
+  animation: fadeSlideUp .3s ease-out forwards;
+}
+
+.page-active {
+  display: block;
+}
+
+@keyframes fadeSlideUp { 
+  from { opacity: 0; transform: translateY(15px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}

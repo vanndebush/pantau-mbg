@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PantauMBG</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { 'bgn-blue': '#1e3a8a', 'mbg-green': '#16a34a' } } }
+    }
+  </script>
+</head>
+<body class="bg-gray-800 text-gray-800 font-sans flex justify-center h-screen">
+  <div class="w-full max-w-md bg-gray-50 h-full relative overflow-y-auto flex flex-col shadow-2xl">
+    <!-- ! S: header -->
+    <header class="bg-bgn-blue text-white p-4 sticky top-0 z-50 shadow-md">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-bowl-food text-xl"></i>
+        <h1 class="font-bold text-lg tracking-wide">PantauMBG</h1>
+      </div>
+    </header>
+    <!-- ! E: header -->
+
+    <!-- ! S: main -->
+    <main class="flex-1 p-4 pb-24">
+      <section id="page-home" class="page-section page-active">
+        <h2 class="text-xl font-bold mb-1 text-gray-800">Ringkasan Nasional</h2>
+        <p class="text-xs text-gray-500 mb-6">Data real-time pelaksanaan MBG</p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="bg-white p-4 rounded-xl shadow-sm text-center border-b-4 border-bgn-blue">
+            <p class="text-xs font-semibold text-gray-500 mb-1">Total SPPG</p>
+            <p class="text-2xl font-bold text-bgn-blue">4.521</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm text-center border-b-4 border-mbg-green">
+            <p class="text-xs font-semibold text-gray-500 mb-1">Siswa Terlayani</p>
+            <p class="text-2xl font-bold text-mbg-green">1.2M</p>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+          <h3 class="text-sm font-bold mb-3 text-center text-gray-700">Tingkat Konsumsi Nasional</h3>
+          <div class="relative w-full h-48"><canvas id="consumptionChart"></canvas></div>
+        </div>
+        <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
+          <div class="flex gap-3 items-start">
+            <i class="fa-solid fa-circle-info text-bgn-blue mt-1"></i>
+            <div>
+              <h4 class="text-sm font-bold text-bgn-blue">Informasi Orang Tua</h4>
+              <p class="text-xs text-gray-600 mt-1">Gunakan menu pencarian untuk mengecek menu makanan anak Anda di sekolah hari ini.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="page-search" class="page-section">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Cari Data SPPG</h2>
+        <div class="relative mb-6">
+          <input type="text" onkeyup="cariSPPG(this.value)" placeholder="Ketik nama sekolah / wilayah..." class="w-full bg-white border border-gray-300 rounded-xl py-3 px-4 pl-10 focus:outline-none focus:border-bgn-blue focus:ring-1 focus:ring-bgn-blue shadow-sm">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-gray-400"></i>
+        </div>
+        <div id="sppg-list"></div>
+      </section>
+      <section id="page-detail" class="page-section">
+        <button onclick="navTo('page-search')" class="text-sm text-bgn-blue mb-4 flex items-center gap-2 font-semibold">
+          <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-gray-100">
+          <div class="bg-gradient-to-r from-mbg-green to-green-600 p-5 text-white">
+            <span id="detail-id" class="text-xs bg-black/20 px-2 py-1 rounded-full mb-2 inline-block">ID</span>
+            <h2 id="detail-nama" class="text-xl font-bold">Nama SPPG</h2>
+            <p class="text-sm opacity-90 mt-1"><i class="fa-solid fa-school mr-1"></i> <span id="detail-suplai"></span></p>
+          </div>
+          <div class="p-5">
+            <h3 class="font-bold text-sm mb-3 border-b pb-2 text-gray-800">Transparansi Menu Hari Ini</h3>
+            <ul id="detail-menu" class="text-sm text-gray-600 mb-5"></ul>
+            <div class="bg-red-50 border border-red-100 p-3 rounded-lg flex justify-between items-center mb-6">
+              <span class="text-sm font-semibold text-red-800">Data Sisa Makanan:</span>
+              <span id="detail-stats" class="text-sm font-bold text-red-600"></span>
+            </div>
+            <hr class="mb-4">
+            <h4 class="text-sm font-bold mb-2 text-gray-800">Ada ketidaksesuaian di lapangan?</h4>
+            <p class="text-xs text-gray-500 mb-3">Bantu kami memastikan kualitas makanan untuk anak-anak dengan melaporkan kejanggalan.</p>
+            <button onclick="mulaiLapor()" class="w-full bg-amber-500 text-white font-bold py-3 rounded-xl shadow hover:bg-amber-600 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-bullhorn"></i> Buat Laporan Pengawasan
+            </button>
+          </div>
+        </div>
+      </section>
+      <section id="page-lapor" class="page-section">
+        <button onclick="navTo('page-detail')" class="text-sm text-gray-500 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-xmark"></i> Batal
+        </button>
+        <h2 class="text-xl font-bold mb-6 text-gray-800">Form Laporan Pengawasan</h2>
+        <form id="form-laporan" onsubmit="submitLaporan(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Target Pengawasan</label>
+            <input type="text" id="form-target" disabled class="w-full bg-gray-100 border border-gray-300 rounded-xl py-2.5 px-3 text-sm text-gray-600 font-semibold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Temuan</label>
+            <select required class="w-full bg-white border border-gray-300 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1">
+              <option value="">Pilih kategori temuan...</option>
+              <option>Menu tidak sesuai aplikasi</option>
+              <option>Kualitas makanan buruk/basi</option>
+              <option>Porsi tidak wajar</option>
+              <option>Keterlambatan distribusi ke sekolah</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Deskripsi Detail</label>
+            <textarea required rows="4" placeholder="Jelaskan secara detail temuan Anda..." class="w-full bg-white border border-gray-300 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-bgn-blue text-white font-bold py-3.5 rounded-xl shadow hover:bg-blue-800 transition mt-6">Kirim Laporan</button>
+        </form>
+      </section>
+      <section id="page-status" class="page-section">
+        <h2 class="text-xl font-bold mb-2 text-gray-800">Lacak Laporan</h2>
+        <p class="text-xs text-gray-500 mb-6">Masukkan kode tiket laporan yang Anda terima</p>
+        <div class="flex gap-2 mb-6">
+          <input type="text" id="input-kode-lapor" placeholder="Contoh: LPR-1029" value="LPR-1029" class="flex-1 bg-white border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1">
+          <button onclick="cekStatusLaporan()" class="bg-bgn-blue text-white px-5 rounded-xl font-bold hover:bg-blue-800 transition">Cari</button>
+        </div>
+        <div id="hasil-status"></div>
+      </section>
+    </main>
+    <!-- ! E: main -->
+
+    <!-- ! S: navbar -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full max-w-md flex justify-around p-3 pb-5 z-50">
+      <button onclick="navTo('page-home')" class="flex flex-col items-center text-gray-400 hover:text-bgn-blue focus:text-bgn-blue">
+        <i class="fa-solid fa-house text-xl mb-1"></i>
+        <span class="text-[10px] font-bold">Beranda</span>
+      </button>
+      <button onclick="navTo('page-search')" class="flex flex-col items-center text-gray-400 hover:text-bgn-blue focus:text-bgn-blue">
+        <i class="fa-solid fa-magnifying-glass text-xl mb-1"></i>
+        <span class="text-[10px] font-bold">Cari SPPG</span>
+      </button>
+      <button onclick="navTo('page-status')" class="flex flex-col items-center text-gray-400 hover:text-bgn-blue focus:text-bgn-blue">
+        <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
+        <span class="text-[10px] font-bold">Lacak</span>
+      </button>
+    </nav>
+    <!-- ! E: navbar -->
+  </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
