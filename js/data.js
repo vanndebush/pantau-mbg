@@ -33,8 +33,28 @@ const dataSPPG = [
       { nama: 'Ikan Lele Goreng', sumber: 'Tambak Kaligawe' },
       { nama: 'Tumis Buncis', sumber: 'Pasar Induk' }
     ],
-    persentaseDimakan: 78,
-    status: 'Beroperasi'
+    persentaseDimakan: 65,
+    status: 'Dalam Evaluasi'
+  },
+  {
+    id: 'SPPG-SMG-004',
+    nama: 'SPPG Kec. Gunungpati',
+    suplai: ['SDN 1 Sekaran', 'SMPN 24'],
+    menuHariIni: [
+      { nama: 'Belum Ada Data', sumber: '-' }
+    ],
+    persentaseDimakan: 0,
+    status: 'Persiapan'
+  },
+  {
+    id: 'SPPG-SMG-005',
+    nama: 'SPPG Kec. Ngaliyan',
+    suplai: ['SDN 3 Ngaliyan'],
+    menuHariIni: [
+      { nama: 'Libur Operasional', sumber: '-' }
+    ],
+    persentaseDimakan: 0,
+    status: 'Tutup Sementara'
   }
 ];
 const dataLaporan = {

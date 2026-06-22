@@ -18,7 +18,7 @@
   <div class="w-full max-w-md bg-gray-50 h-full relative overflow-y-auto flex flex-col shadow-2xl">
     <!-- ! S: header -->
     <header class="bg-bgn-blue text-white p-4 sticky top-0 z-50 shadow-md">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onclick="navTo('page-home')">
         <i class="fa-solid fa-bowl-food text-xl"></i>
         <h1 class="font-bold text-lg tracking-wide">PantauMBG</h1>
       </div>
@@ -100,13 +100,18 @@
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Temuan</label>
-            <select required class="w-full bg-white border border-gray-300 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1">
-              <option value="">Pilih kategori temuan...</option>
-              <option>Menu tidak sesuai aplikasi</option>
-              <option>Kualitas makanan buruk/basi</option>
-              <option>Porsi tidak wajar</option>
-              <option>Keterlambatan distribusi ke sekolah</option>
-            </select>
+            <div class="relative">
+              <select required class="w-full bg-white border border-gray-300 rounded-xl py-2.5 pl-3 pr-10 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1 appearance-none cursor-pointer">
+                <option value="">Pilih kategori temuan...</option>
+                <option>Menu tidak sesuai aplikasi</option>
+                <option>Kualitas makanan buruk/basi</option>
+                <option>Porsi tidak wajar</option>
+                <option>Keterlambatan distribusi ke sekolah</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-bgn-blue">
+                <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200"></i>
+              </div>
+            </div>
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-700 mb-1">Deskripsi Detail</label>
@@ -118,26 +123,56 @@
       <section id="page-status" class="page-section">
         <h2 class="text-xl font-bold mb-2 text-gray-800">Lacak Laporan</h2>
         <p class="text-xs text-gray-500 mb-6">Masukkan kode tiket laporan yang Anda terima</p>
-        <div class="flex gap-2 mb-6">
-          <input type="text" id="input-kode-lapor" placeholder="Contoh: LPR-1029" value="LPR-1029" class="flex-1 bg-white border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1">
-          <button onclick="cekStatusLaporan()" class="bg-bgn-blue text-white px-5 rounded-xl font-bold hover:bg-blue-800 transition">Cari</button>
-        </div>
+
+        <form autocomplete="off" onsubmit="event.preventDefault(); cekStatusLaporan();" class="flex gap-2 mb-6">
+          <input type="text" id="input-kode-lapor" placeholder="Contoh: LPR-1029" class="flex-1 bg-white border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-bgn-blue focus:ring-1">
+          <button type="submit" class="bg-bgn-blue text-white px-5 rounded-xl font-bold hover:bg-blue-800 transition">Cari</button>
+        </form>
         <div id="hasil-status"></div>
       </section>
+      <div id="modal-sukses" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-gray-900/60 backdrop-blur-sm px-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl transform transition-transform duration-300 scale-95" id="modal-content">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fa-solid fa-check text-3xl text-mbg-green"></i>
+          </div>
+          <h3 class="text-xl font-bold text-center text-gray-800 mb-1">Laporan Terkirim!</h3>
+          <p class="text-xs text-center text-gray-500 mb-6">Terima kasih, partisipasi Anda sangat berharga untuk pengawasan program MBG.</p>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 flex justify-between items-center">
+            <div>
+              <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Kode Tiket Anda</p>
+              <p class="text-lg font-bold text-bgn-blue font-mono" id="kode-laporan-modal">LPR-1029</p>
+            </div>
+            <button onclick="copyKode(event)" class="bg-blue-50 text-bgn-blue border border-blue-100 p-2.5 rounded-lg hover:bg-blue-100 transition focus:outline-none" title="Salin Kode"><i class="fa-solid fa-copy"></i></button>
+          </div>
+          <form onsubmit="kirimEmailKode(event)" class="flex gap-2 mb-6">
+            <div class="relative flex-1">
+              <i class="fa-regular fa-envelope absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+              <input type="email" required placeholder="Kirim kode ke email..." class="w-full bg-white border border-gray-300 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:border-bgn-blue focus:ring-1">
+            </div>
+            <button type="submit" class="bg-gray-800 text-white px-4 rounded-xl text-xs font-bold hover:bg-gray-900 transition flex items-center gap-1">
+              <span>Kirim</span>
+            </button>
+          </form>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="tutupModalKe('page-home')" class="py-2.5 border border-gray-300 text-gray-700 font-bold rounded-xl text-sm hover:bg-gray-50 transition">Ke Beranda</button>
+            <button onclick="tutupModalKe('page-status')" class="py-2.5 bg-bgn-blue text-white font-bold rounded-xl text-sm shadow-md hover:bg-blue-800 transition">Lacak Laporan</button>
+          </div>
+        </div>
+      </div>
     </main>
     <!-- ! E: main -->
 
     <!-- ! S: navbar -->
-    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full max-w-md flex justify-around p-3 pb-5 z-50">
-      <button onclick="navTo('page-home')" class="flex flex-col items-center text-gray-400 hover:text-bgn-blue focus:text-bgn-blue">
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full max-w-md flex justify-around p-3 pb-5 z-50" id="bottom-nav">
+      <button id="nav-page-home" onclick="navTo('page-home')" class="nav-btn flex flex-col items-center text-bgn-blue transition">
         <i class="fa-solid fa-house text-xl mb-1"></i>
         <span class="text-[10px] font-bold">Beranda</span>
       </button>
-      <button onclick="navTo('page-search')" class="flex flex-col items-center text-gray-400 hover:text-bgn-blue focus:text-bgn-blue">
+      <button id="nav-page-search" onclick="navTo('page-search')" class="nav-btn flex flex-col items-center text-gray-400 transition hover:text-bgn-blue">
         <i class="fa-solid fa-magnifying-glass text-xl mb-1"></i>
         <span class="text-[10px] font-bold">Cari SPPG</span>
       </button>
-      <button onclick="navTo('page-status')" class="flex flex-col items-center text-gray-400 hover:text-bgn-blue focus:text-bgn-blue">
+      <button id="nav-page-status" onclick="navTo('page-status')" class="nav-btn flex flex-col items-center text-gray-400 transition hover:text-bgn-blue">
         <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
         <span class="text-[10px] font-bold">Lacak</span>
       </button>
